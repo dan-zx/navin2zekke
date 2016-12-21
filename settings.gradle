@@ -1,0 +1,5 @@
+pluginRepositories {
+    maven { url 'http://repo.javalite.io' }
+}
+
+rootProject.name = 'navin2zekke'

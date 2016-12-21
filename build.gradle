@@ -1,0 +1,84 @@
+apply plugin: 'java'
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'net.saliman.cobertura'
+apply plugin: 'org.javalite.activejdbc'
+
+group 'com.zekke'
+version '1.0-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_1_8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint']
+cobertura.coverageFormats = ['html', 'xml']
+
+buildscript {
+
+    ext {
+        activeJdbcVersion = '1.4.13-SNAPSHOT'
+        coverallsVersion  = '2.7.1'
+        coverturaVersion  = '2.3.2'
+    }
+
+    repositories {
+        mavenCentral()
+        maven { url 'http://repo.javalite.io' }
+    }
+
+    dependencies {
+        classpath "net.saliman:gradle-cobertura-plugin:${coverturaVersion}"
+        classpath "org.javalite:activejdbc-gradle-plugin:${activeJdbcVersion}"
+        classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:${coverallsVersion}"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'http://repo.javalite.io' }
+}
+
+ext {
+    activeJdbcVersion = rootProject.activeJdbcVersion
+    assertjVersion    = '3.5.2'
+    guiceVersion      = '4.1.0'
+    groovyVersion     = '2.4.7'
+    gsonVersion       = '2.8.0'
+    h2Version         = '1.4.193'
+    injectVersion     = '1'
+    logbackVersion    = '1.1.7'
+    mockitoVersion    = '2.2.21'
+    testNgVersion     = '6.9.13.6'
+}
+
+dependencies {
+    // DI
+    compile "com.google.inject:guice:${guiceVersion}"
+    compile "javax.inject:javax.inject:${injectVersion}"
+
+    // Database
+    compile "com.h2database:h2:${h2Version}"
+    compile "org.javalite:activejdbc:${activeJdbcVersion}"
+
+    // LOGGING
+    compile "ch.qos.logback:logback-classic:${logbackVersion}"
+    runtime "org.codehaus.groovy:groovy:${groovyVersion}"
+    
+    // OTHER
+    compile "com.google.code.gson:gson:${gsonVersion}"
+
+    // TEST
+    testCompile "org.testng:testng:${testNgVersion}"
+    testCompile "org.assertj:assertj-core:${assertjVersion}"
+    testCompile "org.mockito:mockito-core:${mockitoVersion}"
+}
+
+test {
+    useTestNG()
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2.1'
+}
+
+task run(dependsOn: 'build', type: JavaExec) {
+    main = 'com.zekke.navin2zekke.App'
+    classpath = sourceSets.main.runtimeClasspath
+}
