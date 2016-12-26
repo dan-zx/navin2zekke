@@ -41,7 +41,7 @@ public class Place extends Model {
         if (lat == null) return null;
         Double lng = getDouble(Columns.LONGITUDE);
         if (lng == null) return null;
-        return Coordinates.ofLatLng(lat, lng);
+        return Coordinates.newLatLng(lat, lng);
     }
 
     public List<Path> getPaths() {

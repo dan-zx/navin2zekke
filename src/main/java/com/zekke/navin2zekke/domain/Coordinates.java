@@ -19,7 +19,7 @@ import com.zekke.navin2zekke.util.Constants;
 
 import java.util.Objects;
 
-import static com.zekke.navin2zekke.util.Validations.require;
+import static com.zekke.navin2zekke.util.MessageBundleValidations.require;
 
 /**
  * Represents the geographic location of a place in a map.
@@ -28,29 +28,29 @@ import static com.zekke.navin2zekke.util.Validations.require;
  */
 public class Coordinates {
 
-    private static final double MAX_LATITUDE = 90;
-    private static final double MIN_LATITUDE = -MAX_LATITUDE;
-    private static final double MAX_LONGITUDE = 180;
-    private static final double MIN_LONGITUDE = -MAX_LONGITUDE;
+    public static final double MAX_LATITUDE = 90;
+    public static final double MIN_LATITUDE = -MAX_LATITUDE;
+    public static final double MAX_LONGITUDE = 180;
+    public static final double MIN_LONGITUDE = -MAX_LONGITUDE;
 
     private final double latitude;
     private final double longitude;
-
-    /**
-     * More explicit constructor.
-     *
-     * @param latitude
-     * @param longitude
-     */
-    public static Coordinates ofLatLng(double latitude, double longitude) {
-        return new Coordinates(latitude, longitude);
-    }
 
     private Coordinates(double latitude, double longitude) {
         require(MIN_LATITUDE <= latitude && latitude <= MAX_LATITUDE, "error.arg.range", "latitude", MIN_LATITUDE, MAX_LATITUDE);
         require(MIN_LONGITUDE <= longitude && longitude <= MAX_LONGITUDE, "error.arg.range", "longitude", MIN_LONGITUDE, MAX_LONGITUDE);
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param latitude a double between {@value #MIN_LATITUDE} and {@value #MAX_LATITUDE}.
+     * @param longitude a double between {@value #MIN_LONGITUDE} and {@value #MAX_LONGITUDE}.
+     */
+    public static Coordinates newLatLng(double latitude, double longitude) {
+        return new Coordinates(latitude, longitude);
     }
 
     public double getLatitude() {
