@@ -33,9 +33,9 @@ public class MessagesTest {
 
     @Test
     public void shouldGetMessageUsingArguments() {
-        List<String> args = Arrays.asList("a1arg");
-        String actualMessage = Messages.getMessage("test.message_with_args", args.get(0));
-        assertThat(actualMessage).isNotNull().isNotEmpty().doesNotMatch("\\?\\?\\?.+\\?\\?\\?").contains(args);
+        List<String> args = Arrays.asList("a1arg", "2");
+        String actualMessage = Messages.getMessage("test.message_with_args", args.get(0), args.get(1));
+        assertThat(actualMessage).isNotNull().isNotEmpty().doesNotMatch("\\?\\?\\?.+\\?\\?\\?").contains(args).isEqualTo("Test message with a1arg and 2");
     }
 
     @DataProvider
