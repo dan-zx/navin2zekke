@@ -15,19 +15,16 @@
  */
 package com.zekke.navin2zekke.util;
 
-import java.util.Objects;
-
 import static com.zekke.navin2zekke.util.Messages.getMessage;
-import static com.zekke.navin2zekke.util.Strings.isBlank;
 
 /**
- * IllegalArgumentException validation class.
+ * Validation class with message bundle support.
  *
  * @author Daniel Pedraza-Arcega
  */
-public class Validations {
+public class MessageBundleValidations {
 
-    private Validations() {
+    private MessageBundleValidations() {
         throw new AssertionError();
     }
 
@@ -38,7 +35,7 @@ public class Validations {
      * @throws IllegalArgumentException if {@code expression} is {@code false}
      */
     public static void require(boolean expression, String messageKey, Object... messageArguments) {
-        if (!expression) throw new IllegalArgumentException(getMessage(messageKey, messageArguments));
+        SimpleValidations.require(expression, getMessage(messageKey, messageArguments));
     }
 
     /**
@@ -48,7 +45,7 @@ public class Validations {
      * @throws NullPointerException if {@code obj} is {@code null}
      */
     public static void requireNonNull(Object obj, String messageKey, Object... messageArguments) {
-        Objects.requireNonNull(obj, getMessage(messageKey, messageArguments));
+        SimpleValidations.requireNonNull(obj, getMessage(messageKey, messageArguments));
     }
 
     /**
@@ -59,8 +56,7 @@ public class Validations {
      * @throws IllegalArgumentException if {@code s} is empty.
      */
     public static void requireNonEmpty(String s, String messageKey, Object... messageArguments) {
-        requireNonNull(s, messageKey, messageArguments);
-        require(!s.isEmpty(), messageKey, messageArguments);
+        SimpleValidations.requireNonEmpty(s, getMessage(messageKey, messageArguments));
     }
 
     /**
@@ -71,7 +67,6 @@ public class Validations {
      * @throws IllegalArgumentException if {@code s} is blank.
      */
     public static void requireNonBlank(String s, String messageKey, Object... messageArguments) {
-        requireNonNull(s, messageKey, messageArguments);
-        require(!isBlank(s), messageKey, messageArguments);
+        SimpleValidations.requireNonBlank(s, getMessage(messageKey, messageArguments));
     }
 }

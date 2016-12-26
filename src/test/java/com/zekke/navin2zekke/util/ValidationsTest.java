@@ -15,6 +15,8 @@
  */
 package com.zekke.navin2zekke.util;
 
+import com.zekke.navin2zekke.test.CommonDataProviders;
+
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -32,13 +34,13 @@ public class ValidationsTest {
 
     @Test
     public void shouldThrowNullPointerExceptionWhenArgIsNullInRequireNonNull() {
-        assertThatThrownBy(() -> Validations.requireNonNull(null, ERROR_ARG_NULL_KEY, ARG_NAME)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> MessageBundleValidations.requireNonNull(null, ERROR_ARG_NULL_KEY, ARG_NAME)).isInstanceOf(NullPointerException.class);
     }
 
     @Test
     public void shouldNotThrowAnyExceptionWhenArgIsNotNullInRequireNonNull() {
         try {
-            Validations.requireNonNull(NON_NULL_OBJ, ERROR_ARG_NULL_KEY, ARG_NAME);
+            MessageBundleValidations.requireNonNull(NON_NULL_OBJ, ERROR_ARG_NULL_KEY, ARG_NAME);
         } catch (Exception ex) {
             fail("Unexpected exception", ex);
         }
@@ -46,18 +48,18 @@ public class ValidationsTest {
 
     @Test
     public void shouldThrowNullPointerExceptionWhenArgIsNullInRequireNonEmpty() {
-        assertThatThrownBy(() -> Validations.requireNonEmpty(null, ERROR_ARG_EMPTY_KEY, ARG_NAME)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> MessageBundleValidations.requireNonEmpty(null, ERROR_ARG_EMPTY_KEY, ARG_NAME)).isInstanceOf(NullPointerException.class);
     }
 
     @Test
     public void shouldThrowIllegalArgumentExceptionWhenArgIsEmptyInRequireNonEmpty() {
-        assertThatThrownBy(() -> Validations.requireNonEmpty(Strings.EMPTY, ERROR_ARG_EMPTY_KEY, ARG_NAME)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> MessageBundleValidations.requireNonEmpty(Strings.EMPTY, ERROR_ARG_EMPTY_KEY, ARG_NAME)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test(dataProvider = "nonEmptyStrings")
     public void shouldNotThrowAnyExceptionWhenArgIsNotEmptyInRequireNonEmpty(String nonEmpty) {
         try {
-            Validations.requireNonEmpty(nonEmpty, ERROR_ARG_NULL_KEY, ARG_NAME);
+            MessageBundleValidations.requireNonEmpty(nonEmpty, ERROR_ARG_NULL_KEY, ARG_NAME);
         } catch (Exception ex) {
             fail("Unexpected exception", ex);
         }
@@ -65,31 +67,21 @@ public class ValidationsTest {
 
     @Test
     public void shouldThrowNullPointerExceptionWhenArgIsNullInRequireNonBlank() {
-        assertThatThrownBy(() -> Validations.requireNonBlank(null, ERROR_ARG_BLANK_KEY, ARG_NAME)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> MessageBundleValidations.requireNonBlank(null, ERROR_ARG_BLANK_KEY, ARG_NAME)).isInstanceOf(NullPointerException.class);
     }
 
-    @Test(dataProvider = "blankStrings")
+    @Test(dataProvider = "blankStrings", dataProviderClass = CommonDataProviders.class)
     public void shouldThrowIllegalArgumentExceptionWhenArgIsBlankInRequireNonBlank(String blank) {
-        assertThatThrownBy(() -> Validations.requireNonBlank(blank, ERROR_ARG_BLANK_KEY, ARG_NAME)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> MessageBundleValidations.requireNonBlank(blank, ERROR_ARG_BLANK_KEY, ARG_NAME)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void shouldNotThrowAnyExceptionWhenArgIsNotEmptyInRequireNonBlank() {
         try {
-            Validations.requireNonBlank(STR_WITH_CONTENT, ERROR_ARG_NULL_KEY, ARG_NAME);
+            MessageBundleValidations.requireNonBlank(STR_WITH_CONTENT, ERROR_ARG_NULL_KEY, ARG_NAME);
         } catch (Exception ex) {
             fail("Unexpected exception", ex);
         }
-    }
-
-    @DataProvider
-    public Object[][] blankStrings() {
-        return new Object[][]{
-                {Strings.EMPTY},
-                {Strings.BLANK_SPACE},
-                {Strings.NEW_LINE},
-                {Strings.TAB},
-        };
     }
 
     @DataProvider

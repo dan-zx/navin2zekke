@@ -25,6 +25,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static com.zekke.navin2zekke.util.SimpleValidations.requireNonBlank;
+import static com.zekke.navin2zekke.util.SimpleValidations.requireNonNull;
 import static java.util.Collections.unmodifiableSet;
 
 /**
@@ -74,6 +76,9 @@ public class Messages {
      * given key formatted with the given format arguments.
      */
     public static String getMessage(String messageKey, Locale locale, Object... messageArguments) {
+        requireNonBlank(messageKey, "Message key cannot be blank");
+        requireNonNull(locale, "Message locale cannot be null");
+        if (messageArguments == null) messageArguments = new Object[0];
         String message;
         try {
             message = getMessagesBundle(locale).getString(messageKey);

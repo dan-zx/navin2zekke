@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zekke.navin2zekke.util;
+package com.zekke.navin2zekke.test;
 
-import com.zekke.navin2zekke.test.CommonDataProviders;
+import com.zekke.navin2zekke.util.Strings;
 
-import org.testng.annotations.Test;
+import org.testng.annotations.DataProvider;
 
-import static org.assertj.core.api.Assertions.assertThat;
+public class CommonDataProviders {
 
-public class StringsTest {
-
-    @Test
-    public void shouldReturnFalseWithNonBlankStrings() {
-        assertThat(Strings.isBlank("\nnon blank ")).isFalse();
-    }
-
-    @Test(dataProvider = "blankStrings", dataProviderClass = CommonDataProviders.class)
-    public void shouldReturnTrueWithBlankStrings(String blankString) {
-        assertThat(Strings.isBlank(blankString)).isTrue();
+    @DataProvider
+    public static Object[][] blankStrings() {
+        return new Object[][]{
+                {Strings.EMPTY},
+                {Strings.BLANK_SPACE},
+                {Strings.NEW_LINE},
+                {Strings.TAB},
+        };
     }
 }
