@@ -28,11 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.zekke.navin2zekke.database.DatabaseHelper.rollback;
 import static com.zekke.navin2zekke.database.DatabaseHelper.close;
 import static com.zekke.navin2zekke.database.DatabaseHelper.commit;
-import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonBlank;
-import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonNull;
+import static com.zekke.navin2zekke.database.DatabaseHelper.rollback;
 import static com.zekke.navin2zekke.util.Messages.getMessage;
 import static com.zekke.navin2zekke.util.Strings.BLANK_SPACE;
 import static com.zekke.navin2zekke.util.Strings.EMPTY;
@@ -58,8 +56,6 @@ class SqlFileRunner {
      * method is finished.
      */
     static void runScriptFromClasspath(String classpath, Connection connection) {
-        requireNonBlank(classpath, "error.arg.blank", "Classpath file");
-        requireNonNull(connection, "error.arg.null", "Database connection");
         List<String> statements = getSqlStatementsFromClasspath(classpath);
         LOGGER.debug("Running {} ...", classpath);
         try (Statement stmt = connection.createStatement()) {
@@ -75,8 +71,9 @@ class SqlFileRunner {
                     .messageKey("error.database.stmt")
                     .cause(ex)
                     .build();
+        } finally {
+            close(connection);
         }
-        close(connection);
     }
 
     private static List<String> getSqlStatementsFromClasspath(String classpath) {

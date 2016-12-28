@@ -15,7 +15,6 @@
  */
 package com.zekke.navin2zekke.database;
 
-import com.zekke.navin2zekke.test.CommonDataProviders;
 import com.zekke.navin2zekke.util.PropertiesLoader;
 
 import org.testng.annotations.Test;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 public class SqlFileRunnerTest {
@@ -54,21 +52,6 @@ public class SqlFileRunnerTest {
         }
 
         assertThat(names).isNotNull().isNotEmpty().hasSize(3).containsExactly("John", "Jane", "Dan");
-    }
-
-    @Test
-    public void shouldThrowNullPointerExceptionIfConnectionIsNull() {
-        assertThatThrownBy(() -> SqlFileRunner.runScriptFromClasspath("any", null)).isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
-    public void shouldThrowNullPointerExceptionIfClaspathIsNull() {
-        assertThatThrownBy(() -> SqlFileRunner.runScriptFromClasspath(null, null)).isInstanceOf(NullPointerException.class);
-    }
-
-    @Test(dataProvider = "blankStrings", dataProviderClass = CommonDataProviders.class)
-    public void shouldThrowIllegalArgumentExceptionIfClasspathIsBlank(String classpath) {
-        assertThatThrownBy(() -> SqlFileRunner.runScriptFromClasspath(classpath, null)).isInstanceOf(IllegalArgumentException.class);
     }
 
     private Connection acquireConnection() {
