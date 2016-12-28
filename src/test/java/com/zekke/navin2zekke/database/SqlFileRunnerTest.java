@@ -16,7 +16,7 @@
 package com.zekke.navin2zekke.database;
 
 import com.zekke.navin2zekke.test.CommonDataProviders;
-import com.zekke.navin2zekke.test.PropertiesLoader;
+import com.zekke.navin2zekke.util.PropertiesLoader;
 
 import org.testng.annotations.Test;
 
@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.fail;
 
 public class SqlFileRunnerTest {
 
-    private static final Properties DB_PROPS = PropertiesLoader.getFromClasspath("/configs/database.properties");
+    private static final Properties DB_PROPS = PropertiesLoader.propertiesFromClasspath("/configs/database.properties");
 
     @Test
     public void shouldParseAndExecuteSqls() {

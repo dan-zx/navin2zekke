@@ -13,26 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zekke.navin2zekke.test;
+package com.zekke.navin2zekke.util;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonBlank;
+import static com.zekke.navin2zekke.util.Messages.getMessage;
+
+/**
+ * Properties loader utility.
+ *
+ * @author Daniel Pedraza-Arcega
+ */
 public class PropertiesLoader {
 
     private PropertiesLoader() {
         throw new AssertionError();
     }
 
-    public static Properties getFromClasspath(String classpath) {
+    /**
+     * Loads properties file from classpath.
+     *
+     * @param classpath classpath location.
+     * @return a properties object.
+     */
+    public static Properties propertiesFromClasspath(String classpath) {
+        requireNonBlank(classpath, "error.arg.blank", "Properties classpath location");
         Properties props;
         try (InputStream stream = PropertiesLoader.class.getResourceAsStream(classpath)) {
             props = new Properties();
             props.load(stream);
             return props;
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(getMessage("error.file.not_valid", classpath), ex);
         }
     }
 }
