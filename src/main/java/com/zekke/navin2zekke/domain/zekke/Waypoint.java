@@ -28,11 +28,21 @@ import static com.zekke.navin2zekke.util.Strings.EMPTY;
  *
  * @author Daniel Pedraza-Arcega
  */
-public abstract class Waypoint {
+public class Waypoint {
 
+    private String id;
     private String name;
     private Coordinates coordinates;
+    private Type type;
     private Set<Path> paths = new HashSet<>();
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -50,6 +60,14 @@ public abstract class Waypoint {
         this.coordinates = coordinates;
     }
 
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     public Set<Path> getPaths() {
         return paths;
     }
@@ -65,28 +83,27 @@ public abstract class Waypoint {
 
         Waypoint other = (Waypoint) o;
 
-        return Objects.equals(name, other.name) &&
-                Objects.equals(coordinates, other.coordinates);
+        return Objects.equals(id, other.id) &&
+                Objects.equals(name, other.name) &&
+                Objects.equals(coordinates, other.coordinates) &&
+                Objects.equals(type, other.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name, coordinates);
+        return Objects.hash(super.hashCode(), id, name, coordinates, type);
     }
 
     @Override
     public String toString() {
-        String extras = toStringExtras();
-        return getClass().getSimpleName() + "{" +
-                "name='" + name + '\'' +
+        return "Waypoint{" +
+                "id='" + id +
+                ", name='" + name +
                 ", coordinates=" + coordinates +
+                ", type=" + type +
                 ", paths=" + paths +
-                (extras == null ? EMPTY : ", " + extras) +
                 '}';
     }
 
-    /** @return extras to append to the base {@link #toString()} method. */
-    protected String toStringExtras() {
-        return null;
-    }
+    public enum Type { POI, WALKWAY; }
 }
