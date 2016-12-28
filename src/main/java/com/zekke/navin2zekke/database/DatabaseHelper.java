@@ -15,7 +15,11 @@
  */
 package com.zekke.navin2zekke.database;
 
+import com.google.inject.Inject;
+
 import org.javalite.activejdbc.Base;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,7 +28,6 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonNull;
@@ -36,6 +39,7 @@ import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonNull
  */
 public class DatabaseHelper {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseHelper.class);
     private static final Set<String> LOADED_DRIVERS = new HashSet<>();
 
     private final String driverClassName;
@@ -43,15 +47,15 @@ public class DatabaseHelper {
     private final String databaseUser;
     private final String databasePassword;
 
+    private String[] initScripts;
+
     /**
      * Constructor.
      *
      * @param connectionProperties Properties object with the following propeties set:
      * jdbc.driver_class_name, jdbc.url, jdbc.user, jdbc.password
      */
-    public
-    @Inject
-    DatabaseHelper(@Named("JDBC properties") Properties connectionProperties) {
+    public @Inject DatabaseHelper(@Named("jdbcProperties") Properties connectionProperties) {
         driverClassName = connectionProperties.getProperty("jdbc.driver_class_name");
         requireNonNull(driverClassName, "error.arg.null", "JDBC Driver");
         connectionUrl = connectionProperties.getProperty("jdbc.url");
@@ -75,6 +79,7 @@ public class DatabaseHelper {
     static Connection acquireConnection(String driverClassName, String url, String user, String password) {
         loadDriverIfNecessary(driverClassName);
         try {
+            LOGGER.trace("Open connection {} user={}", url, user);
             Connection connection = DriverManager.getConnection(url, user, password);
             connection.setAutoCommit(false);
             return connection;
@@ -90,6 +95,7 @@ public class DatabaseHelper {
     private static void loadDriverIfNecessary(String driverClassName) {
         if (!LOADED_DRIVERS.contains(driverClassName)) {
             try {
+                LOGGER.trace("Load driver {}", driverClassName);
                 Class.forName(driverClassName);
                 LOADED_DRIVERS.add(driverClassName);
             } catch (ClassNotFoundException ex) {
@@ -109,6 +115,7 @@ public class DatabaseHelper {
      */
     static void close(Connection connection) {
         try {
+            LOGGER.trace("Close connection");
             connection.close();
         } catch (SQLException ex) {
             throw new DatabaseException.Builder()
@@ -125,6 +132,7 @@ public class DatabaseHelper {
      */
     static void commit(Connection connection) {
         try {
+            LOGGER.trace("Commit transaction");
             connection.commit();
         } catch (SQLException ex) {
             throw new DatabaseException.Builder()
@@ -141,6 +149,7 @@ public class DatabaseHelper {
      */
     static void rollback(Connection connection) {
         try {
+            LOGGER.trace("Rollback transaction");
             connection.rollback();
         } catch (SQLException ex) {
             throw new DatabaseException.Builder()
@@ -161,13 +170,27 @@ public class DatabaseHelper {
         closeActiveJdbc();
     }
 
+    /**
+     * Sets script classpath location to initialize the database with them.
+     *
+     * @param scripts an array of classpath locations.
+     */
+    public @Inject(optional = true) void setInitScripts(@Named("dbScriptLocations") String[] scripts) {
+        initScripts = scripts;
+    }
+
     private void openActiveJdbc() {
+        LOGGER.trace("Open ActiveJDBC");
         Base.open(driverClassName, connectionUrl, databaseUser, databasePassword);
     }
 
     private void initDatabase() {
-        runScript(Scripts.SCHEMA);
-        runScript(Scripts.DATA_LOAD);
+        if (initScripts != null) {
+            LOGGER.trace("Running init scripts...");
+            for (String script : initScripts) {
+                runScript(script);
+            }
+        }
     }
 
     private void runScript(String scriptLocation) {
@@ -176,19 +199,11 @@ public class DatabaseHelper {
     }
 
     private void closeActiveJdbc() {
+        LOGGER.trace("Close ActiveJDBC");
         Base.close();
     }
 
     private Connection acquireConnection() {
         return acquireConnection(driverClassName, connectionUrl, databaseUser, databasePassword);
-    }
-
-    private static class Scripts {
-        private static final String SCHEMA = "/scripts/sql/navin_schema.sql";
-        private static final String DATA_LOAD = "/scripts/sql/navin_data.sql";
-
-        private Scripts() {
-            throw new AssertionError();
-        }
     }
 }
