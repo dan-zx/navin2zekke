@@ -24,33 +24,24 @@ import java.util.Objects;
  */
 public class Path {
 
-    private Waypoint a;
-    private Waypoint b;
-    private Direction direction;
+    private Waypoint from;
+    private Waypoint to;
     private double distance;
 
-    public Waypoint getA() {
-        return a;
+    public Waypoint getFrom() {
+        return from;
     }
 
-    public void setA(Waypoint a) {
-        this.a = a;
+    public void setFrom(Waypoint from) {
+        this.from = from;
     }
 
-    public Waypoint getB() {
-        return b;
+    public Waypoint getTo() {
+        return to;
     }
 
-    public void setB(Waypoint b) {
-        this.b = b;
-    }
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
+    public void setTo(Waypoint to) {
+        this.to = to;
     }
 
     public double getDistance() {
@@ -68,45 +59,23 @@ public class Path {
 
         Path other = (Path) o;
 
-        return Objects.equals(a, other.a) &&
-                Objects.equals(b, other.b) &&
-                Objects.equals(direction, other.direction) &&
+        return Objects.equals(from, other.from) &&
+                Objects.equals(to, other.to) &&
                 Objects.equals(distance, other.distance);
 
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(a, b, direction, distance);
+        return Objects.hash(from, to, distance);
     }
 
     @Override
     public String toString() {
         return "Path{" +
-                "(" + ((a == null) ? null : a.getName()) + ")" +
-                direction +
-                "(" + ((b == null) ? null : b.getName()) + ")" +
-                ", distance=" + distance +
+                "(" + (from == null ? null : from.getName()) +
+                ")->(" + (to == null ? null : to.getName()) +
+                "), distance=" + distance +
                 '}';
-    }
-
-    /** Direction of the Path, for example: {@literal A->B, A<-B, A<->B} */
-    public enum Direction {
-        AB {
-            @Override
-            public String toString() {
-                return "->";
-            }
-        }, BA {
-            @Override
-            public String toString() {
-                return "<-";
-            }
-        }, BIDIRECTIONAL {
-            @Override
-            public String toString() {
-                return "<->";
-            }
-        }
     }
 }
