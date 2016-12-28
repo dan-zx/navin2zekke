@@ -19,7 +19,7 @@ import com.zekke.navin2zekke.util.Messages;
 
 import java.util.Arrays;
 
-import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonEmpty;
+import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonBlank;
 
 /**
  * Base application exception.
@@ -68,7 +68,7 @@ public abstract class ZekkeException extends RuntimeException {
 
         /** @param messageKey the key for the desired message. */
         public BaseExceptionBuilder<E> messageKey(String messageKey) {
-            requireNonEmpty(messageKey, "error.arg.blank", "messageKey");
+            if (messageKey != null) requireNonBlank(messageKey, "error.arg.blank", "messageKey");
             this.messageKey = messageKey;
             return this;
         }
