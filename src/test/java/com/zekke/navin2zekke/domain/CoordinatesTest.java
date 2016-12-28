@@ -19,9 +19,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static com.zekke.navin2zekke.domain.Coordinates.newLatLng;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.data.Offset.offset;
 
 public class CoordinatesTest {
 
@@ -34,11 +32,6 @@ public class CoordinatesTest {
     @Test(dataProvider = "invalidLatLng")
     public void shouldThrowIllegalArgumentExceptionWhenLatLngAreOutOfBounds(double lat, double lng) {
         assertThatThrownBy(() -> newLatLng(lat, lng)).isInstanceOf(IllegalArgumentException.class).hasNoCause();
-    }
-
-    @Test
-    public void shouldCalculateDistanceInMeters() {
-        assertThat(VALID_COORDINATES.distanceTo(newLatLng(19.050991, -98.278627))).isCloseTo(616.56, offset(0.01));
     }
 
     @DataProvider

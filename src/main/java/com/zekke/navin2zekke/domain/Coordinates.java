@@ -15,8 +15,6 @@
  */
 package com.zekke.navin2zekke.domain;
 
-import com.zekke.navin2zekke.util.Constants;
-
 import java.util.Objects;
 
 import static com.zekke.navin2zekke.util.MessageBundleValidations.require;
@@ -59,23 +57,6 @@ public class Coordinates {
 
     public double getLongitude() {
         return longitude;
-    }
-
-    /**
-     * Calculates the distance between this location and another.
-     *
-     * @param other the other location.
-     * @return the distance in meters.
-     */
-    public double distanceTo(Coordinates other) {
-        double lat1rad = Math.toRadians(latitude);
-        double lat2rad = Math.toRadians(other.latitude);
-        double deltaLat = Math.toRadians(other.latitude - latitude);
-        double deltaLon = Math.toRadians(other.longitude - longitude);
-        double a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) + Math.cos(lat1rad) * Math.cos(lat2rad) * Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double d = Constants.EARTH_RADIUS * c;
-        return d;
     }
 
     @Override
