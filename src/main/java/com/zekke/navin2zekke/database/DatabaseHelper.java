@@ -170,6 +170,11 @@ public class DatabaseHelper {
         closeActiveJdbc();
     }
 
+    /** @return an initialized connection with the properties set in this object. */
+    public Connection acquireConnection() {
+        return acquireConnection(driverClassName, connectionUrl, databaseUser, databasePassword);
+    }
+
     /**
      * Sets script classpath location to initialize the database with them.
      *
@@ -201,9 +206,5 @@ public class DatabaseHelper {
     private void closeActiveJdbc() {
         LOGGER.trace("Close ActiveJDBC");
         Base.close();
-    }
-
-    private Connection acquireConnection() {
-        return acquireConnection(driverClassName, connectionUrl, databaseUser, databasePassword);
     }
 }

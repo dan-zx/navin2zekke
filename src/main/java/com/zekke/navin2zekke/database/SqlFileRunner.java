@@ -43,7 +43,7 @@ import static java.util.Collections.unmodifiableList;
  *
  * @author Daniel Pedraza-Arcega
  */
-class SqlFileRunner {
+public class SqlFileRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SqlFileRunner.class);
     private static final String SQL_DELIMITER = ";";
@@ -55,7 +55,7 @@ class SqlFileRunner {
      * @param connection an open connection to a database. The connection will be close when this
      * method is finished.
      */
-    static void runScriptFromClasspath(String classpath, Connection connection) {
+    public static void runScriptFromClasspath(String classpath, Connection connection) {
         List<String> statements = getSqlStatementsFromClasspath(classpath);
         LOGGER.debug("Running {} ...", classpath);
         try (Statement stmt = connection.createStatement()) {
