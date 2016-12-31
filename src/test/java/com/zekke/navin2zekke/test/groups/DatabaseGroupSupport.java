@@ -34,16 +34,16 @@ public class DatabaseGroupSupport {
 
     private DatabaseHelper databaseHelper;
 
+    public static <T> T getInstance(Class<T> type) {
+        return injector.getInstance(type);
+    }
+
     @BeforeGroups(groups = "database")
     public void beforeDatabaseTests() {
         LOGGER.trace("Creating database...");
         injector = Guice.createInjector(new TestDatabaseModule());
         databaseHelper = injector.getInstance(DatabaseHelper.class);
         databaseHelper.setup();
-    }
-
-    public static <T> T getInstance(Class<T> type) {
-        return injector.getInstance(type);
     }
 
     @AfterGroups(groups = "database")

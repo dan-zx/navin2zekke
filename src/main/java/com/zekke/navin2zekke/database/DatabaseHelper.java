@@ -76,7 +76,7 @@ public class DatabaseHelper {
      * @param password a valid user password.
      * @return a database connection.
      */
-    static Connection acquireConnection(String driverClassName, String url, String user, String password) {
+    public static Connection acquireConnection(String driverClassName, String url, String user, String password) {
         loadDriverIfNecessary(driverClassName);
         try {
             LOGGER.trace("Open connection {} user={}", url, user);

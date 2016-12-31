@@ -24,6 +24,7 @@ import java.util.Properties;
 import static com.zekke.navin2zekke.util.PropertiesLoader.propertiesFromClasspath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 public class PropertiesLoaderTest {
 
@@ -44,7 +45,7 @@ public class PropertiesLoaderTest {
 
     @Test
     public void shouldLoadProperties() {
-        Properties props = propertiesFromClasspath("/configs/database.properties");
-        assertThat(props).isNotNull();
+        Properties props = propertiesFromClasspath("/test.properties");
+        assertThat(props).isNotNull().containsExactly(entry("a2_prop", "Prop2"), entry("a1_prop", "Prop1"));
     }
 }

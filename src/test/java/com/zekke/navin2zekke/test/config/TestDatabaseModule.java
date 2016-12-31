@@ -27,13 +27,15 @@ import com.zekke.navin2zekke.database.DatabaseHelper;
 
 import java.util.Properties;
 
+import static com.zekke.navin2zekke.test.config.DatabaseUtil.dbProperties;
+
 public class TestDatabaseModule extends AbstractModule {
 
     @Override
     protected void configure() {
         bind(Properties.class)
                 .annotatedWith(Names.named("jdbcProperties"))
-                .toInstance(testProperties());
+                .toInstance(dbProperties());
         bind(String[].class)
                 .annotatedWith(Names.named("dbScriptLocations"))
                 .toInstance(new String[]{"/scripts/sql/init.sql"});
@@ -45,14 +47,5 @@ public class TestDatabaseModule extends AbstractModule {
                 .in(Scopes.SINGLETON);
         bind(DatabaseHelper.class)
                 .in(Scopes.SINGLETON);
-    }
-
-    private Properties testProperties() {
-        Properties props = new Properties();
-        props.setProperty("jdbc.driver_class_name", "org.h2.Driver");
-        props.setProperty("jdbc.url", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
-        props.setProperty("jdbc.user", "root");
-        props.setProperty("jdbc.password", "");
-        return props;
     }
 }

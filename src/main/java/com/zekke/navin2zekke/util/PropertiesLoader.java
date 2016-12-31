@@ -15,7 +15,6 @@
  */
 package com.zekke.navin2zekke.util;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 

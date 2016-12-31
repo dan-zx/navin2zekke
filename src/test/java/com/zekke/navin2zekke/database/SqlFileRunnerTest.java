@@ -15,8 +15,6 @@
  */
 package com.zekke.navin2zekke.database;
 
-import com.zekke.navin2zekke.util.PropertiesLoader;
-
 import org.testng.annotations.Test;
 
 import java.sql.Connection;
@@ -24,14 +22,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
+import static com.zekke.navin2zekke.test.config.DatabaseUtil.acquireConnection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 public class SqlFileRunnerTest {
-
-    private static final Properties DB_PROPS = PropertiesLoader.propertiesFromClasspath("/configs/database.properties");
 
     @Test
     public void shouldParseAndExecuteSqls() {
@@ -52,13 +48,5 @@ public class SqlFileRunnerTest {
         }
 
         assertThat(names).isNotNull().isNotEmpty().hasSize(3).containsExactly("John", "Jane", "Dan");
-    }
-
-    private Connection acquireConnection() {
-        return DatabaseHelper.acquireConnection(
-                DB_PROPS.getProperty("jdbc.driver_class_name"),
-                DB_PROPS.getProperty("jdbc.url"),
-                DB_PROPS.getProperty("jdbc.user"),
-                DB_PROPS.getProperty("jdbc.password"));
     }
 }
