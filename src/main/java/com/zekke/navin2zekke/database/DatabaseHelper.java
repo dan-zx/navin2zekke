@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -47,7 +48,7 @@ public class DatabaseHelper {
     private final String databaseUser;
     private final String databasePassword;
 
-    private String[] initScripts;
+    private Optional<String[]> initScripts = Optional.empty();
 
     /**
      * Constructor.
@@ -181,7 +182,7 @@ public class DatabaseHelper {
      * @param scripts an array of classpath locations.
      */
     public @Inject(optional = true) void setInitScripts(@Named("dbScriptLocations") String[] scripts) {
-        initScripts = scripts;
+        initScripts = Optional.ofNullable(scripts);
     }
 
     private void openActiveJdbc() {
@@ -190,12 +191,12 @@ public class DatabaseHelper {
     }
 
     private void initDatabase() {
-        if (initScripts != null) {
+        initScripts.ifPresent(scripts -> {
             LOGGER.trace("Running init scripts...");
-            for (String script : initScripts) {
+            for (String script : scripts) {
                 runScript(script);
             }
-        }
+        });
     }
 
     private void runScript(String scriptLocation) {
