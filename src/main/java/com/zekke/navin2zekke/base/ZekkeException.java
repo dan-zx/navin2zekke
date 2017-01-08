@@ -17,9 +17,10 @@ package com.zekke.navin2zekke.base;
 
 import com.zekke.navin2zekke.util.Messages;
 
-import java.util.Arrays;
+import java.util.Locale;
 
 import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonBlank;
+import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonNull;
 
 /**
  * Base application exception.
@@ -39,19 +40,19 @@ public abstract class ZekkeException extends RuntimeException {
      * @param builder a builder.
      */
     protected ZekkeException(BaseExceptionBuilder<? extends ZekkeException> builder) {
-        super(builder.messageKey == null ? null : Messages.getMessage(builder.messageKey, builder.messageArgs), builder.throwable);
+        super(builder.buildMessageOrNull(), builder.throwable);
         this.messageKey = builder.messageKey;
         this.messageArgs = builder.messageArgs;
     }
 
-    /** @return the message key. */
-    public String getMessageKey() {
-        return messageKey;
-    }
-
-    /** @return the message arguments. */
-    public Object[] getMessageArgs() {
-        return messageArgs == null ? null : Arrays.copyOf(messageArgs, messageArgs.length);
+    /**
+     * @param locale a locale.
+     * @return the localized version of the this exception's message.
+     */
+    public String getMessage(Locale locale) {
+        requireNonNull(locale, "error.arg.null", "Locale");
+        if (messageKey != null) return Messages.getMessage(messageKey, locale, messageArgs);
+        return null;
     }
 
     /**
@@ -63,8 +64,8 @@ public abstract class ZekkeException extends RuntimeException {
     public static abstract class BaseExceptionBuilder<E extends ZekkeException> implements Buildable<E> {
 
         private String messageKey;
-        private Throwable throwable;
         private Object[] messageArgs;
+        private Throwable throwable;
 
         /** @param messageKey the key for the desired message. */
         public BaseExceptionBuilder<E> messageKey(String messageKey) {
@@ -91,6 +92,11 @@ public abstract class ZekkeException extends RuntimeException {
         public BaseExceptionBuilder<E> cause(Throwable throwable) {
             this.throwable = throwable;
             return this;
+        }
+
+        private String buildMessageOrNull() {
+            if (messageKey != null) return Messages.getMessage(messageKey, messageArgs);
+            return null;
         }
     }
 }
