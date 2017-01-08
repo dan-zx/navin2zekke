@@ -21,8 +21,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.zekke.navin2zekke.util.Strings.EMPTY;
-
 /**
  * Generic point in a map with name.
  *
@@ -30,17 +28,17 @@ import static com.zekke.navin2zekke.util.Strings.EMPTY;
  */
 public class Waypoint {
 
-    private String id;
+    private int id;
     private String name;
     private Coordinates coordinates;
     private Type type;
     private Set<Path> paths = new HashSet<>();
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
