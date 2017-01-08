@@ -68,6 +68,8 @@ public class ZekkeExceptionTest {
 
     private static class ZekkeExceptionImpl extends ZekkeException {
 
+        private static final long serialVersionUID = 1L;
+
         private ZekkeExceptionImpl(Builder builder) {
             super(builder);
         }

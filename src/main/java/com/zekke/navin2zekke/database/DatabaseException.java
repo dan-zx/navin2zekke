@@ -24,6 +24,8 @@ import com.zekke.navin2zekke.base.ZekkeException;
  */
 public class DatabaseException extends ZekkeException {
 
+    private static final long serialVersionUID = 1L;
+
     private DatabaseException(Builder builder) {
         super(builder);
     }

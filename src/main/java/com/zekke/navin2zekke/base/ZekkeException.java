@@ -28,7 +28,7 @@ import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonBlan
  */
 public abstract class ZekkeException extends RuntimeException {
 
-    private static final long serialVersionUID = 23425667534234L;
+    private static final long serialVersionUID = 1L;
 
     private final String messageKey;
     private final Object[] messageArgs;
