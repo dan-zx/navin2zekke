@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
 import static com.zekke.navin2zekke.database.DatabaseHelper.close;
 import static com.zekke.navin2zekke.database.DatabaseHelper.commit;
 import static com.zekke.navin2zekke.database.DatabaseHelper.rollback;
+import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonBlank;
+import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonNull;
 import static com.zekke.navin2zekke.util.Messages.getMessage;
 import static com.zekke.navin2zekke.util.Strings.BLANK_SPACE;
 import static com.zekke.navin2zekke.util.Strings.EMPTY;
@@ -56,6 +58,8 @@ public class SqlFileRunner {
      * method is finished.
      */
     public static void runScriptFromClasspath(String classpath, Connection connection) {
+        requireNonBlank(classpath, "error.arg.blank", "Classpath file");
+        requireNonNull(connection, "error.arg.null", "JDBC Connection");
         List<String> statements = getSqlStatementsFromClasspath(classpath);
         LOGGER.debug("Running {} ...", classpath);
         try (Statement stmt = connection.createStatement()) {
