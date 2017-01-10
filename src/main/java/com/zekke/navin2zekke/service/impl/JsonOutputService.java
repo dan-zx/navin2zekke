@@ -25,6 +25,9 @@ import com.zekke.navin2zekke.domain.zekke.Waypoint;
 import com.zekke.navin2zekke.service.OutputService;
 import com.zekke.navin2zekke.service.ServiceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,6 +48,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class JsonOutputService implements OutputService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonOutputService.class);
     private static final String DEFAULT_JSON_FILE_PATH = "dist/json";
     private static final String FILE_NAME = "zekke_graph.json";
 
@@ -71,6 +75,7 @@ public class JsonOutputService implements OutputService {
                     .cause(ex)
                     .build();
         }
+        LOGGER.info("Finished JSON at: {}/{}", jsonFilePath, FILE_NAME);
     }
 
     private File createJsonFile() {
