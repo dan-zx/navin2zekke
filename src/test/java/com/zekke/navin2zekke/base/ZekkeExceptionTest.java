@@ -15,15 +15,19 @@
  */
 package com.zekke.navin2zekke.base;
 
+import com.zekke.navin2zekke.test.CommonDataProviders;
+
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ZekkeExceptionTest {
 
     @Test
     public void shouldHaveNoCauseNorMessage() {
         assertThat(new ZekkeExceptionImpl.Builder().build()).isNotNull().hasNoCause().hasMessage(null).extracting("messageKey", "messageArgs").containsExactly(null, null);
+        assertThat(new ZekkeExceptionImpl.Builder().messageKey(null).build()).isNotNull().hasNoCause().hasMessage(null).extracting("messageKey", "messageArgs").containsExactly(null, null);
     }
 
     @Test
@@ -64,6 +68,11 @@ public class ZekkeExceptionTest {
                 .messageArgs(args[0], args[1])
                 .build())
                 .isNotNull().hasMessage("Test message with 5 and other").hasCauseExactlyInstanceOf(NullPointerException.class).extracting("messageKey", "messageArgs").containsExactly(messageKey, args);
+    }
+
+    @Test(dataProvider = "blankStrings", dataProviderClass = CommonDataProviders.class)
+    public void shouldThrowIllegalArgumentExceptionWhenMessageKeyIsBlank(String messageKey) {
+        assertThatThrownBy(() -> new ZekkeExceptionImpl.Builder().messageKey(messageKey)).isInstanceOf(IllegalArgumentException.class);
     }
 
     private static class ZekkeExceptionImpl extends ZekkeException {
