@@ -28,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * Application starter.
@@ -41,13 +39,17 @@ public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
-        new App().run();
+        new App(Guice.createInjector(new AppModule())).run();
     }
 
-    private void run() {
+    private final Injector injector;
+
+    App(Injector injector) {
+        this.injector = injector;
+    }
+
+    void run() {
         try {
-            LOGGER.info("Wiring dependencies...");
-            Injector injector = Guice.createInjector(new AppModule());
             DatabaseHelper databaseHelper = injector.getInstance(DatabaseHelper.class);
             DomainTranslatorService domainTranslatorService = injector.getInstance(DomainTranslatorService.class);
             OutputService outputService = injector.getInstance(OutputService.class);
@@ -57,8 +59,6 @@ public class App {
 
             LOGGER.info("Translating Navin domain to ZeKKe domain...");
             Set<Waypoint> waypoints = domainTranslatorService.translateNavinToZekke();
-            SortedSet<Waypoint> sortedWaypoints = new TreeSet<>((w1, w2) -> Integer.compare(w1.getId(), w2.getId()));
-            sortedWaypoints.addAll(waypoints);
 
             LOGGER.info("Writing translation...");
             outputService.write(waypoints);
