@@ -6,3 +6,15 @@ Navin2ZeKKe Migration Tool
 [![Coverage Status](https://coveralls.io/repos/github/dan-zx/navin2zekke/badge.svg?branch=master)](https://coveralls.io/github/dan-zx/navin2zekke?branch=master)
 
 This tool migrates Navin's old model and to new ZeKKe app model.
+
+Usage
+-----
+
+```sh
+$ ./gradlew clean run
+```
+
+Mapped Area
+-----------
+
+![Mapped Area](https://raw.githubusercontent.com/dan-zx/navin2zekke/master/etc/img/mapped_area.png)
