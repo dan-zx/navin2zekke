@@ -19,7 +19,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import com.zekke.navin2zekke.database.DatabaseHelper;
-import com.zekke.navin2zekke.database.SqlFileRunner;
 import com.zekke.navin2zekke.test.config.TestDatabaseModule;
 
 import org.slf4j.Logger;
@@ -40,16 +39,16 @@ public class DatabaseGroupSupport {
 
     @BeforeGroups(groups = "database")
     public void beforeDatabaseTests() {
-        LOGGER.trace("Creating database...");
+        LOGGER.trace("Wiring dependencies...");
         injector = Guice.createInjector(new TestDatabaseModule());
         databaseHelper = injector.getInstance(DatabaseHelper.class);
-        databaseHelper.setup();
+        LOGGER.trace("Creating database...");
+        databaseHelper.init();
     }
 
     @AfterGroups(groups = "database")
     public void afterDatabaseTests() {
         LOGGER.trace("Destroying database...");
-        SqlFileRunner.runScriptFromClasspath("/scripts/sql/destroy.sql", databaseHelper.acquireConnection());
-        databaseHelper.close();
+        databaseHelper.destroy();
     }
 }

@@ -46,13 +46,14 @@ public class App {
 
     private void run() {
         try {
+            LOGGER.info("Wiring dependencies...");
             Injector injector = Guice.createInjector(new AppModule());
             DatabaseHelper databaseHelper = injector.getInstance(DatabaseHelper.class);
             DomainTranslatorService domainTranslatorService = injector.getInstance(DomainTranslatorService.class);
             OutputService outputService = injector.getInstance(OutputService.class);
 
             LOGGER.info("Connecting and initializing database...");
-            databaseHelper.setup();
+            databaseHelper.init();
 
             LOGGER.info("Translating Navin domain to ZeKKe domain...");
             Set<Waypoint> waypoints = domainTranslatorService.translateNavinToZekke();
@@ -62,8 +63,8 @@ public class App {
             LOGGER.info("Writing translation...");
             outputService.write(waypoints);
 
-            LOGGER.info("Closing database...");
-            databaseHelper.close();
+            LOGGER.info("Closing and destroying database...");
+            databaseHelper.destroy();
 
             LOGGER.info("Done");
         } catch (Exception ex) {

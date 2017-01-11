@@ -46,7 +46,7 @@ public class AppModule extends AbstractModule {
                 .annotatedWith(named("jdbcProperties"))
                 .toInstance(propertiesFromClasspath(Locations.DATABASE_PROPERTIES));
         bind(String[].class)
-                .annotatedWith(named("dbScriptLocations"))
+                .annotatedWith(named("dbInitScriptLocations"))
                 .toInstance(new String[]{Locations.DATABASE_SCHEMA, Locations.DATABASE_DATA_LOAD});
         bind(PathDao.class)
                 .to(PathActiveJdbcDao.class)
@@ -66,8 +66,8 @@ public class AppModule extends AbstractModule {
 
     private static class Locations {
         private static final String DATABASE_PROPERTIES = "/configs/database.properties";
-        private static final String DATABASE_SCHEMA = "/scripts/sql/navin_schema.sql";
-        private static final String DATABASE_DATA_LOAD = "/scripts/sql/navin_data.sql";
+        private static final String DATABASE_SCHEMA = "scripts/sql/navin_schema.sql";
+        private static final String DATABASE_DATA_LOAD = "scripts/sql/navin_data.sql";
 
         private Locations() {
             throw new AssertionError();

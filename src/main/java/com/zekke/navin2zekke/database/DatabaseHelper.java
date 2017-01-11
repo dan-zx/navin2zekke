@@ -24,7 +24,9 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -34,7 +36,7 @@ import javax.inject.Named;
 import static com.zekke.navin2zekke.util.MessageBundleValidations.requireNonNull;
 
 /**
- * Helps in database setup and destruction.
+ * Helps in database initialization and destruction.
  *
  * @author Daniel Pedraza-Arcega
  */
@@ -46,9 +48,10 @@ public class DatabaseHelper {
     private final String driverClassName;
     private final String connectionUrl;
     private final String databaseUser;
-    private final String databasePassword;
+    private final String databaseUserPassword;
 
     private Optional<String[]> initScripts = Optional.empty();
+    private Optional<String[]> destroyScripts = Optional.empty();
 
     /**
      * Constructor.
@@ -63,37 +66,105 @@ public class DatabaseHelper {
         requireNonNull(connectionUrl, "error.arg.null", "JDBC URL");
         databaseUser = connectionProperties.getProperty("jdbc.user");
         requireNonNull(databaseUser, "error.arg.null", "JDBC User");
-        databasePassword = connectionProperties.getProperty("jdbc.password");
-        requireNonNull(databasePassword, "error.arg.null", "JDBC Password");
+        databaseUserPassword = connectionProperties.getProperty("jdbc.password");
+        requireNonNull(databaseUserPassword, "error.arg.null", "JDBC User Password");
+    }
+
+    /** Initializes connections and, optionally, initializes the database. */
+    public void init() {
+        openActiveJdbc();
+        initDatabase();
+    }
+
+    /** Closes connections and, optionally, destroys the database. */
+    public void destroy() {
+        closeActiveJdbc();
+        destroyDatabase();
     }
 
     /**
-     * Acquires a database connection using the provided parameters. The connection is set to not
-     * autocommitable.
+     * Sets script classpath location to initialize the database with them.
      *
-     * @param driverClassName a valid driver class name.
-     * @param url a valid connection url.
-     * @param user a valid database user.
-     * @param password a valid user password.
-     * @return a database connection.
+     * @param scripts an array of classpath locations.
      */
-    public static Connection acquireConnection(String driverClassName, String url, String user, String password) {
+    public @Inject(optional = true) void setInitScripts(@Named("dbInitScriptLocations") String[] scripts) {
+        initScripts = Optional.ofNullable(scripts);
+    }
+
+    /**
+     * Sets script classpath location to destroy the database with them.
+     *
+     * @param scripts an array of classpath locations.
+     */
+    public @Inject(optional = true) void setDestroyScripts(@Named("dbDestroyScriptLocations") String[] scripts) {
+        destroyScripts = Optional.ofNullable(scripts);
+    }
+
+    private void openActiveJdbc() {
+        LOGGER.trace("Open ActiveJDBC");
+        Base.open(driverClassName, connectionUrl, databaseUser, databaseUserPassword);
+    }
+
+    private void initDatabase() {
+        initScripts.ifPresent(scripts -> {
+            LOGGER.trace("Running init scripts...");
+            for (String script : scripts) {
+                runScript(script);
+            }
+        });
+    }
+
+    private void destroyDatabase() {
+        destroyScripts.ifPresent(scripts -> {
+            LOGGER.trace("Running destroy scripts...");
+            for (String script : scripts) {
+                runScript(script);
+            }
+        });
+    }
+
+    private void runScript(String scriptLocation) {
+        LOGGER.debug("Parsing {} ...", scriptLocation);
+        List<String> statements = SqlFileParser.newFromClasspath(scriptLocation).getStatements();
+        Connection connection = acquireConnection();
+        try {
+            LOGGER.debug("Running {} ...", scriptLocation);
+            try (Statement stmt = connection.createStatement()) {
+                for (String statement : statements) {
+                    LOGGER.debug(statement);
+                    stmt.addBatch(statement);
+                }
+                stmt.executeBatch();
+                commit(connection);
+            }
+        } catch (SQLException ex) {
+            rollback(connection);
+            throw new DatabaseException.Builder()
+                    .messageKey("error.database.stmt")
+                    .cause(ex)
+                    .build();
+        } finally {
+            close(connection);
+        }
+    }
+
+    private Connection acquireConnection() {
         loadDriverIfNecessary(driverClassName);
         try {
-            LOGGER.trace("Open connection {} user={}", url, user);
-            Connection connection = DriverManager.getConnection(url, user, password);
+            LOGGER.trace("Open connection {} user={}", connectionUrl, databaseUser);
+            Connection connection = DriverManager.getConnection(connectionUrl, databaseUser, databaseUserPassword);
             connection.setAutoCommit(false);
             return connection;
         } catch (SQLException ex) {
             throw new DatabaseException.Builder()
                     .messageKey("error.database.not_connected")
-                    .messageArgs(url)
+                    .messageArgs(connectionUrl)
                     .cause(ex)
                     .build();
         }
     }
 
-    private static void loadDriverIfNecessary(String driverClassName) {
+    private void loadDriverIfNecessary(String driverClassName) {
         if (!LOADED_DRIVERS.contains(driverClassName)) {
             try {
                 LOGGER.trace("Load driver {}", driverClassName);
@@ -109,29 +180,7 @@ public class DatabaseHelper {
         }
     }
 
-    /**
-     * Closes the provided connection.
-     *
-     * @param connection an open connection.
-     */
-    static void close(Connection connection) {
-        try {
-            LOGGER.trace("Close connection");
-            connection.close();
-        } catch (SQLException ex) {
-            throw new DatabaseException.Builder()
-                    .messageKey("error.database.close_connection")
-                    .cause(ex)
-                    .build();
-        }
-    }
-
-    /**
-     * Commits the current transaction.
-     *
-     * @param connection an open connection.
-     */
-    static void commit(Connection connection) {
+    private void commit(Connection connection) {
         try {
             LOGGER.trace("Commit transaction");
             connection.commit();
@@ -143,12 +192,7 @@ public class DatabaseHelper {
         }
     }
 
-    /**
-     * Rollbacks the current transaction.
-     *
-     * @param connection an open connection.
-     */
-    static void rollback(Connection connection) {
+    private void rollback(Connection connection) {
         try {
             LOGGER.trace("Rollback transaction");
             connection.rollback();
@@ -160,48 +204,16 @@ public class DatabaseHelper {
         }
     }
 
-    /** Initializes connections. */
-    public void setup() {
-        openActiveJdbc();
-        initDatabase();
-    }
-
-    /** Closes connections. */
-    public void close() {
-        closeActiveJdbc();
-    }
-
-    /** @return an initialized connection with the properties set in this object. */
-    public Connection acquireConnection() {
-        return acquireConnection(driverClassName, connectionUrl, databaseUser, databasePassword);
-    }
-
-    /**
-     * Sets script classpath location to initialize the database with them.
-     *
-     * @param scripts an array of classpath locations.
-     */
-    public @Inject(optional = true) void setInitScripts(@Named("dbScriptLocations") String[] scripts) {
-        initScripts = Optional.ofNullable(scripts);
-    }
-
-    private void openActiveJdbc() {
-        LOGGER.trace("Open ActiveJDBC");
-        Base.open(driverClassName, connectionUrl, databaseUser, databasePassword);
-    }
-
-    private void initDatabase() {
-        initScripts.ifPresent(scripts -> {
-            LOGGER.trace("Running init scripts...");
-            for (String script : scripts) {
-                runScript(script);
-            }
-        });
-    }
-
-    private void runScript(String scriptLocation) {
-        Connection connection = acquireConnection();
-        SqlFileRunner.runScriptFromClasspath(scriptLocation, connection);
+    private void close(Connection connection) {
+        try {
+            LOGGER.trace("Close connection");
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DatabaseException.Builder()
+                    .messageKey("error.database.close_connection")
+                    .cause(ex)
+                    .build();
+        }
     }
 
     private void closeActiveJdbc() {

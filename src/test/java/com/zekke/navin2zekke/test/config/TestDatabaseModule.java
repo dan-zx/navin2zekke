@@ -27,7 +27,7 @@ import com.zekke.navin2zekke.database.DatabaseHelper;
 
 import java.util.Properties;
 
-import static com.zekke.navin2zekke.test.config.DatabaseUtil.dbProperties;
+import static com.zekke.navin2zekke.util.PropertiesLoader.propertiesFromClasspath;
 
 public class TestDatabaseModule extends AbstractModule {
 
@@ -35,10 +35,13 @@ public class TestDatabaseModule extends AbstractModule {
     protected void configure() {
         bind(Properties.class)
                 .annotatedWith(Names.named("jdbcProperties"))
-                .toInstance(dbProperties());
+                .toInstance(propertiesFromClasspath("/configs/database.properties"));
         bind(String[].class)
-                .annotatedWith(Names.named("dbScriptLocations"))
-                .toInstance(new String[]{"/scripts/sql/init.sql"});
+                .annotatedWith(Names.named("dbInitScriptLocations"))
+                .toInstance(new String[]{"scripts/sql/init.sql"});
+        bind(String[].class)
+                .annotatedWith(Names.named("dbDestroyScriptLocations"))
+                .toInstance(new String[]{"scripts/sql/destroy.sql"});
         bind(PathDao.class)
                 .to(PathActiveJdbcDao.class)
                 .in(Scopes.SINGLETON);
